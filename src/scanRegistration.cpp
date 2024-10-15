@@ -179,6 +179,17 @@ void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg) {
         count--;
         continue;
       }
+    }
+    if (N_SCANS == 128) {
+      // Calculate the scanID based on the angle
+      scanID = int((angle + 25.0) /
+                   (95.0 / N_SCANS)); // Map -25° to +120° to 128 beams
+
+      // Ensure the scanID is within the valid range [0, N_SCANS-1]
+      if (scanID >= N_SCANS || scanID < 0) {
+        count--; // Invalid scanID, skip the point
+        continue;
+      }
     } else {
       printf("wrong scan number\n");
       ROS_BREAK();
@@ -384,31 +395,31 @@ void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg) {
   sensor_msgs::PointCloud2 laserCloudOutMsg;
   pcl::toROSMsg(*laserCloud, laserCloudOutMsg);
   laserCloudOutMsg.header.stamp = laserCloudMsg->header.stamp;
-  laserCloudOutMsg.header.frame_id = "/camera_init";
+  laserCloudOutMsg.header.frame_id = "camera_init";
   pubLaserCloud.publish(laserCloudOutMsg);
 
   sensor_msgs::PointCloud2 cornerPointsSharpMsg;
   pcl::toROSMsg(cornerPointsSharp, cornerPointsSharpMsg);
   cornerPointsSharpMsg.header.stamp = laserCloudMsg->header.stamp;
-  cornerPointsSharpMsg.header.frame_id = "/camera_init";
+  cornerPointsSharpMsg.header.frame_id = "camera_init";
   pubCornerPointsSharp.publish(cornerPointsSharpMsg);
 
   sensor_msgs::PointCloud2 cornerPointsLessSharpMsg;
   pcl::toROSMsg(cornerPointsLessSharp, cornerPointsLessSharpMsg);
   cornerPointsLessSharpMsg.header.stamp = laserCloudMsg->header.stamp;
-  cornerPointsLessSharpMsg.header.frame_id = "/camera_init";
+  cornerPointsLessSharpMsg.header.frame_id = "camera_init";
   pubCornerPointsLessSharp.publish(cornerPointsLessSharpMsg);
 
   sensor_msgs::PointCloud2 surfPointsFlat2;
   pcl::toROSMsg(surfPointsFlat, surfPointsFlat2);
   surfPointsFlat2.header.stamp = laserCloudMsg->header.stamp;
-  surfPointsFlat2.header.frame_id = "/camera_init";
+  surfPointsFlat2.header.frame_id = "camera_init";
   pubSurfPointsFlat.publish(surfPointsFlat2);
 
   sensor_msgs::PointCloud2 surfPointsLessFlat2;
   pcl::toROSMsg(surfPointsLessFlat, surfPointsLessFlat2);
   surfPointsLessFlat2.header.stamp = laserCloudMsg->header.stamp;
-  surfPointsLessFlat2.header.frame_id = "/camera_init";
+  surfPointsLessFlat2.header.frame_id = "camera_init";
   pubSurfPointsLessFlat.publish(surfPointsLessFlat2);
 
   // pub each scam
@@ -417,7 +428,7 @@ void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg) {
       sensor_msgs::PointCloud2 scanMsg;
       pcl::toROSMsg(laserCloudScans[i], scanMsg);
       scanMsg.header.stamp = laserCloudMsg->header.stamp;
-      scanMsg.header.frame_id = "/camera_init";
+      scanMsg.header.frame_id = "camera_init";
       pubEachScan[i].publish(scanMsg);
     }
   }
@@ -437,14 +448,14 @@ int main(int argc, char **argv) {
 
   printf("scan line number %d \n", N_SCANS);
 
-  if (N_SCANS != 16 && N_SCANS != 32 && N_SCANS != 64) {
+  if (N_SCANS != 16 && N_SCANS != 32 && N_SCANS != 64 && N_SCANS != 128) {
     printf("only support velodyne with 16, 32 or 64 scan line!");
     return 0;
   }
 
   ros::Subscriber subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>(
-      "/velodyne_points", 100, laserCloudHandler);
-
+      "/publisher/rayz_points", 100, laserCloudHandler);
+  //"/velodyne_points"
   pubLaserCloud =
       nh.advertise<sensor_msgs::PointCloud2>("/velodyne_cloud_2", 100);
 

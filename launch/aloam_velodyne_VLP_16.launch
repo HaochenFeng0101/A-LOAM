@@ -1,6 +1,6 @@
 <launch>
     
-    <param name="scan_line" type="int" value="16" />
+    <param name="scan_line" type="int" value="128" />
 
     <!-- if 1, do mapping 10 Hz, if 2, do mapping 5 Hz. Suggest to use 1, it will adjust frequence automaticlly -->
     <param name="mapping_skip_frame" type="int" value="1" />
@@ -22,5 +22,9 @@
     <group if="$(arg rviz)">
         <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find aloam_velodyne)/rviz_cfg/aloam_velodyne.rviz" />
     </group>
+
+
+    <!--- Record rosbag for /laser_cloud_surround topic -->
+    <node pkg="rosbag" type="record" name="rosbag_record" args="/laser_cloud_surround -O /home/rayz2004/catkin_ws/dataset/map_aloam/map_aloam.bag" output="screen" />
 
 </launch>
