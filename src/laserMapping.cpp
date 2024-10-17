@@ -226,6 +226,22 @@ void laserOdometryHandler(const nav_msgs::Odometry::ConstPtr &laserOdometry) {
   odomAftMapped.pose.pose.position.y = t_w_curr.y();
   odomAftMapped.pose.pose.position.z = t_w_curr.z();
   pubOdomAftMappedHighFrec.publish(odomAftMapped);
+
+  std::ofstream pose1("/home/rayz2004/catkin_ws/dataset/m2u2/path_m2u2.txt",
+                      std::ios::app);
+  pose1.setf(std::ios::scientific, std::ios::floatfield);
+  // 保存结果的精度，可调
+
+  pose1.precision(6);
+  pose1 << ros::Time::now().toNSec() << " "
+        << odomAftMapped.pose.pose.position.x << " "
+        << odomAftMapped.pose.pose.position.y << " "
+        << odomAftMapped.pose.pose.position.z << " "
+        << odomAftMapped.pose.pose.orientation.x << " "
+        << odomAftMapped.pose.pose.orientation.y << " "
+        << odomAftMapped.pose.pose.orientation.z << " "
+        << odomAftMapped.pose.pose.orientation.w << std::endl;
+  pose1.close();
 }
 
 void process() {

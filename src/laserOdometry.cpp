@@ -55,6 +55,7 @@
 #include "aloam_velodyne/common.h"
 #include "aloam_velodyne/tic_toc.h"
 #include "lidarFactor.hpp"
+#include <fstream>
 
 #define DISTORTION 0
 
@@ -247,7 +248,7 @@ int main(int argc, char **argv) {
       timeSurfPointsFlat = surfFlatBuf.front()->header.stamp.toSec();
       timeSurfPointsLessFlat = surfLessFlatBuf.front()->header.stamp.toSec();
       timeLaserCloudFullRes = fullPointsBuf.front()->header.stamp.toSec();
-
+      // check if time is sync
       if (timeCornerPointsSharp != timeLaserCloudFullRes ||
           timeCornerPointsLessSharp != timeLaserCloudFullRes ||
           timeSurfPointsFlat != timeLaserCloudFullRes ||
